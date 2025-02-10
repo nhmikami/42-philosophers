@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   utils_bonus.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: naharumi <naharumi@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/10 15:22:50 by naharumi          #+#    #+#             */
+/*   Updated: 2025/02/10 15:25:33 by naharumi         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../inc/philo_bonus.h"
 
 int	get_current_time(void)
@@ -28,19 +40,7 @@ void	ft_usleep(int milliseconds)
 	return ;
 }
 
-void	free_all(t_philo *philo)
-{
-	int		i;
 
-	i = 0;
-	while (i < philo->data->num_philos)
-	{
-		pthread_mutex_destroy(&philo[i].meal_lock);
-		i++;
-	}
-	destroy_data_mtx(philo->data, 3);
-	free(philo);
-}
 
 // utils
 size_t	ft_strlen(const char *s)

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main_bonus.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: naharumi <naharumi@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/10 15:22:43 by naharumi          #+#    #+#             */
+/*   Updated: 2025/02/10 18:16:41 by naharumi         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../inc/philo_bonus.h"
 
 // simulation
@@ -103,11 +115,15 @@ int	init_data(t_data *data)
 // philo routine
 void    init_philo(t_philo *philo, t_data *data, int i)
 {
+	char	*str_id;
+
 	philo->id = i + 1;
 	philo->meals_taken = 0;
 	philo->last_meal = data->start_time;
 	philo->data = data;
-	philo->sem_name = ft_strjoin("state", ft_itoa(philo->id)); // malloc
+	str_id = ft_itoa(philo->id);
+	philo->sem_name = ft_strjoin("state", str_id); // malloc
+	free(str_id);
 	sem_unlink(philo->sem_name);
 	philo->meal_sem = sem_open(philo->sem_name, O_CREAT, 0660, 1);
 }
@@ -172,12 +188,12 @@ void	philo_routine(t_data *data, int i)
 	t_philo		philo;
 
 	init_philo(&philo, data, i);
-	pthread_create(&philo->monitor, NULL, self_monitor, (void *)&philo);
-	pthread_detach(philo->monitor);
+	pthread_create(&philo.monitor, NULL, self_monitor, (void *)&philo);
+	pthread_detach(philo.monitor);
 	if (data->num_philos == 1)
 	{
-		print_action(philo, TAKE_FORK);
-		ft_usleep(philo->data->time_to_die);
+		print_action(&philo, TAKE_FORK);
+		ft_usleep(philo.data->time_to_die);
 	}
 	if (philo.id % 2 == 0)
 		thinking(&philo);
@@ -187,6 +203,7 @@ void	philo_routine(t_data *data, int i)
 		sleeping(&philo);
 		thinking(&philo);
 	}
+	free(philo.sem_name);
 }
 
 // monitor_routine
@@ -213,6 +230,7 @@ void	*starvation(void *arg)
 	stop_simulation(data, 1);
 	kill_all_philos(data);
 	sem_post(data->full_sem);
+	return (NULL);
 }
 
 void	*all_full(void *arg)
@@ -232,6 +250,7 @@ void	*all_full(void *arg)
 	stop_simulation(data, 1);
 	kill_all_philos(data);
 	sem_post(data->starve_sem);
+	return (NULL);
 }
 
 // simulation
@@ -249,35 +268,19 @@ int	stop_simulation(t_data *data, int stop)
 
 void	start_simulation(t_data *data)
 {
-	int		i;
-	t_philo	philos[data->num_philos];
+	int	i;
+	int	status;
 
 	i = 0;
 	while (i < data->num_philos)
 	{
 		data->philo_pid[i] = fork();
 		if (data->philo_pid[i] == 0)
-		{
-			init_philo(&philos[i], data, i);
 			philo_routine(data, i);
-		}
 		i++;
 	}
-	wait_philos(data, &philos);
-}
-
-void	wait_philos(t_data *data, t_philo *philos)
-{
-	int	i;
-
 	while (waitpid(-1, &status, 0) != -1)
 		;
-	i = 0;
-	while (i < data->num_philos)
-	{
-		free(philos[i].sem_name);
-		i++;
-	}
 	close_data_semaphores(data, 6);
 	unlink_data_semaphores();
 	free(data->philo_pid);
@@ -292,11 +295,11 @@ int main(int ac, char **av)
 		return (1);
 	if (!init_data(&data)) // malloc data->philo_pid
 		return (1);
-	pthread_create(&data->starvation, NULL, &starvation, (void *)&data);
-	pthread_create(&data->all_full, NULL, &all_full, (void *)&data);
+	pthread_create(&data.starvation, NULL, &starvation, (void *)&data);
+	pthread_create(&data.all_full, NULL, &all_full, (void *)&data);
 	start_simulation(&data);
-	pthread_join(data->starvation, NULL);
-	pthread_join(data->all_full, NULL);
+	pthread_join(data.starvation, NULL);
+	pthread_join(data.all_full, NULL);
 	return (0);
 }
 
