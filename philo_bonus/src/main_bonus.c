@@ -59,29 +59,21 @@ int init_data_semaphores(t_data *data)
 void	close_data_semaphores(t_data *data, int stage)
 {
 	if (stage >= 2)
-	{
 		sem_close(data->fork_sem);
-		if (stage >= 3)
-		{
-			sem_close(data->print_sem);
-			if (stage >= 4)
-			{
-				sem_close(data->full_sem);
-				if (stage >= 5)
-				{
-					sem_close(data->starve_sem);
-					if (stage == 6)
-						sem_close(data->stop_sem);
-				}
-			}
-		}
-	}
+	if (stage >= 3)
+		sem_close(data->print_sem);
+	if (stage >= 4)
+		sem_close(data->full_sem);
+	if (stage >= 5)
+		sem_close(data->starve_sem);
+	if (stage == 6)
+		sem_close(data->stop_sem);
 }
 
 void	unlink_data_semaphores(void)
 {
 	sem_unlink("/fork");
-	sem_unlink("/printf");
+	sem_unlink("/print");
 	sem_unlink("/full");
 	sem_unlink("/starve");
 	sem_unlink("/stop");
@@ -148,7 +140,7 @@ static void	eating(t_philo *philo)
 		sem_post(philo->data->full_sem);
 	ft_usleep(philo->data->time_to_eat);
 	sem_post(philo->data->fork_sem);
-	sem_wait(philo->data->fork_sem);
+	sem_post(philo->data->fork_sem);
 }
 
 static void	sleeping(t_philo *philo)
@@ -168,13 +160,14 @@ void	*self_monitor(void *arg)
 	t_philo	*philo;
 
 	philo = (t_philo *)arg;
-	while (true)
+	while (!stop_simulation(philo->data, 0))
 	{
 		sem_wait(philo->meal_sem);
 		if (time_elapsed(philo->last_meal) > philo->data->time_to_die)
 		{
 			print_action(philo, DIE);
 			sem_post(philo->data->starve_sem);
+			sem_post(philo->meal_sem);
 			break;
 		}
 		sem_post(philo->meal_sem);
@@ -197,12 +190,14 @@ void	philo_routine(t_data *data, int i)
 	}
 	if (philo.id % 2 == 0)
 		thinking(&philo);
-	while (true)
+	while (!stop_simulation(data, 0))
 	{
 		eating(&philo);
 		sleeping(&philo);
 		thinking(&philo);
 	}
+	sem_close(philo.meal_sem);
+	sem_unlink(philo.sem_name);
 	free(philo.sem_name);
 }
 
