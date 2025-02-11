@@ -6,7 +6,7 @@
 /*   By: naharumi <naharumi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/10 15:22:34 by naharumi          #+#    #+#             */
-/*   Updated: 2025/02/10 18:21:55 by naharumi         ###   ########.fr       */
+/*   Updated: 2025/02/11 19:22:12 by naharumi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,10 @@
 # define PHILO_BONUS_H
 
 # include <limits.h>
-# include <fcntl.h> 
+# include <fcntl.h>
 # include <pthread.h>
 # include <semaphore.h>
 # include <signal.h>
-# include <stdbool.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <sys/stat.h>
@@ -68,22 +67,23 @@ typedef struct s_philo
 // initialization
 int		get_args(int ac, char **av, t_data *data);
 int		init_data(t_data *data);
-void    init_philo(t_philo *philo, t_data *data, int i);
+void	init_philo(t_philo *philo, t_data *data, int i);
 void	close_data_semaphores(t_data *data, int stage);
 void	unlink_data_semaphores(void);
 
 // simulation
 void	start_simulation(t_data *data);
-int	stop_simulation(t_data *data, int stop);
+int		stop_simulation(t_data *data, int stop);
 void	print_action(t_philo *philo, t_action action);
 void	philo_routine(t_data *data, int i);
+void	*all_full(void *arg);
+void	*starvation(void *arg);
 
 // utils
 int		get_current_time(void);
 int		time_elapsed(int start_time);
 void	ft_usleep(int milliseconds);
 void	kill_all_philos(t_data *data);
-
 char	*ft_itoa(int n);
 char	*ft_strjoin(char const *s1, char const *s2);
 

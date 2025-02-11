@@ -8,6 +8,10 @@ INC_PATH		=	./include
 
 SRC				=	main_bonus.c \
 					get_args_bonus.c \
+					init_data_bonus.c \
+					libft_bonus.c \
+					philo_routine_bonus.c \
+					simulation_bonus.c \
 					utils_bonus.c
 
 OBJ				=	$(addprefix $(SRC_PATH)/, $(SRC:.c=.o))
