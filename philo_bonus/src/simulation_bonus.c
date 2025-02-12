@@ -31,7 +31,8 @@ void	print_action(t_philo *philo, t_action action)
 		else if (action == DIE)
 			printf("%d %d died\n", timestamp, philo->id);
 	}
-	sem_post(philo->data->print_sem);
+	if (action != DIE)
+		sem_post(philo->data->print_sem);
 }
 
 void	*starvation(void *arg)
@@ -40,10 +41,11 @@ void	*starvation(void *arg)
 
 	data = (t_data *)arg;
 	sem_wait(data->starve_sem);
-	if (stop_simulation(data, 0))
-		return (NULL);
-	stop_simulation(data, 1);
-	kill_all_philos(data);
+	if (!stop_simulation(data, 0))
+	{
+		stop_simulation(data, 1);
+		kill_all_philos(data);
+	}
 	sem_post(data->full_sem);
 	return (NULL);
 }
@@ -55,15 +57,17 @@ void	*all_full(void *arg)
 
 	data = (t_data *)arg;
 	count_full = 0;
-	while (count_full < data->num_philos)
+	while (count_full < data->num_philos && !stop_simulation(data, 0))
 	{
 		sem_wait(data->full_sem);
-		if (stop_simulation(data, 0))
-			return (NULL);
-		count_full++;
+		if (!stop_simulation(data, 0))
+			count_full++;
 	}
-	stop_simulation(data, 1);
-	kill_all_philos(data);
+	if (!stop_simulation(data, 0))
+	{
+		stop_simulation(data, 1);
+		kill_all_philos(data);
+	}
 	sem_post(data->starve_sem);
 	return (NULL);
 }
@@ -81,6 +85,9 @@ void	start_simulation(t_data *data)
 		{
 			printf("Error: failed to create process\n");
 			kill_all_philos(data);
+			close_data_semaphores(data, 6);
+			unlink_data_semaphores();
+			free(data->philo_pid);
 			return ;
 		}
 		if (data->philo_pid[i] == 0)

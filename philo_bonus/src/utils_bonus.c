@@ -30,12 +30,12 @@ int	time_elapsed(int start_time)
 	return (elapsed_time);
 }
 
-void	ft_usleep(int milliseconds)
+void	ft_usleep(int period)
 {
 	int	start;
 
 	start = get_current_time();
-	while ((get_current_time() - start) < milliseconds)
+	while ((get_current_time() - start) < period)
 		usleep(10);
 	return ;
 }

@@ -82,7 +82,7 @@ void	*starvation(void *arg);
 // utils
 int		get_current_time(void);
 int		time_elapsed(int start_time);
-void	ft_usleep(int milliseconds);
+void	ft_usleep(int period);
 void	kill_all_philos(t_data *data);
 char	*ft_itoa(int n);
 char	*ft_strjoin(char const *s1, char const *s2);

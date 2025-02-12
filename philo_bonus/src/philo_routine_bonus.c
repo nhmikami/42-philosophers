@@ -32,14 +32,20 @@ static void	eating(t_philo *philo)
 
 static void	sleeping(t_philo *philo)
 {
-	print_action(philo, SLEEP);
-	ft_usleep(philo->data->time_to_sleep);
+	if (!stop_simulation(philo->data, 0))
+	{
+		print_action(philo, SLEEP);
+		ft_usleep(philo->data->time_to_sleep);
+	}
 }
 
 static void	thinking(t_philo *philo)
 {
-	print_action(philo, THINK);
-	usleep(500);
+	if (!stop_simulation(philo->data, 0))
+	{
+		print_action(philo, THINK);
+		usleep(500);
+	}
 }
 
 static void	*self_monitor(void *arg)
@@ -72,6 +78,7 @@ void	philo_routine(t_data *data, int i)
 	pthread_detach(philo.monitor);
 	if (data->num_philos == 1)
 	{
+		sem_wait(philo.data->fork_sem);
 		print_action(&philo, TAKE_FORK);
 		ft_usleep(philo.data->time_to_die);
 	}
