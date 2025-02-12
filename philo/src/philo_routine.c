@@ -6,7 +6,7 @@
 /*   By: naharumi <naharumi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/10 14:50:29 by naharumi          #+#    #+#             */
-/*   Updated: 2025/02/10 14:50:30 by naharumi         ###   ########.fr       */
+/*   Updated: 2025/02/12 18:43:51 by naharumi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,15 +46,21 @@ static void	*eating(t_philo *philo)
 
 static void	*sleeping(t_philo *philo)
 {
-	print_action(philo, SLEEP);
-	ft_usleep(philo->data->time_to_sleep);
+	if (!stop_simulation(philo, 0))
+	{
+		print_action(philo, SLEEP);
+		ft_usleep(philo->data->time_to_sleep);
+	}
 	return (NULL);
 }
 
 static void	*thinking(t_philo *philo)
 {
-	print_action(philo, THINK);
-	usleep(500);
+	if (!stop_simulation(philo, 0))
+	{
+		print_action(philo, THINK);
+		usleep(500);
+	}
 	return (NULL);
 }
 

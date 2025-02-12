@@ -26,6 +26,8 @@ $(NAME):			$(OBJ)
 $(SRC_PATH)%.o: $(SRC_PATH)%.c $(INC_PATH)/philo_bonus.h
 	$(CC) $(CFLAGS) -c $< -o $@ $(INC)
 
+bonus:				all
+
 clean:
 					$(RM) $(OBJ)
 
@@ -34,4 +36,4 @@ fclean:				clean
 
 re:					fclean all
 
-.PHONY:		all clean fclean re
+.PHONY:		all bonus clean fclean re

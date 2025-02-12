@@ -6,7 +6,7 @@
 /*   By: naharumi <naharumi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:52:00 by naharumi          #+#    #+#             */
-/*   Updated: 2025/02/11 19:50:04 by naharumi         ###   ########.fr       */
+/*   Updated: 2025/02/12 18:20:11 by naharumi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,8 @@ void	*all_full(void *arg)
 
 	data = (t_data *)arg;
 	count_full = 0;
+	if (data->num_philos == 1 || data->time_to_die < 0)
+		return (NULL);
 	while (count_full < data->num_philos && !stop_simulation(data, 0))
 	{
 		sem_wait(data->full_sem);
@@ -75,7 +77,6 @@ void	*all_full(void *arg)
 void	start_simulation(t_data *data)
 {
 	int	i;
-	int	status;
 
 	i = 0;
 	while (i < data->num_philos)
@@ -94,11 +95,6 @@ void	start_simulation(t_data *data)
 			philo_routine(data, i);
 		i++;
 	}
-	while (waitpid(-1, &status, 0) != -1)
-		;
-	close_data_semaphores(data, 6);
-	unlink_data_semaphores();
-	free(data->philo_pid);
 }
 
 int	stop_simulation(t_data *data, int stop)
